@@ -3,6 +3,7 @@ variable "project_id" {
 }
 
 variable "region" {
+  default     = "us-east5"
   description = "region"
 }
 

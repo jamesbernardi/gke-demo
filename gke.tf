@@ -13,10 +13,10 @@ module "gke" {
   name                            = "${var.project_id}-cluster"
   regional                        = true
   region                          = var.region
-  network                         = google_compute_subnetwork.subnet.name
+  network                         = google_compute_network.vpc.name
   subnetwork                      = google_compute_subnetwork.subnet.name
-  ip_range_pods                   = google_compute_subnetwork.subnet.ip_range_pods
-  ip_range_services               = google_compute_subnetwork.subnet.ip_range_services
+  ip_range_pods                   = google_compute_subnetwork.subnet.ipv6_cidr_range
+  ip_range_services               = google_compute_subnetwork.subnet.ipv6_cidr_range
   release_channel                 = "REGULAR"
   enable_vertical_pod_autoscaling = true
 }
