@@ -6,17 +6,31 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(module.gke.ca_certificate)
 }
 
+module "gke_auth" {
+  source = "terraform-google-modules/kubernetes-engine/google//modules/auth"
+  version = "~> 24"
+  depends_on   = [module.gke]
+  project_id   = var.project_id
+  location     = module.gke.location
+  cluster_name = module.gke.name
+}
+
 module "gke" {
   source                          = "terraform-google-modules/kubernetes-engine/google//modules/beta-autopilot-public-cluster/"
-  version                         = "~> 25.0.0"
+  version                         = "~> 25"
   project_id                      = var.project_id
   name                            = "${var.project_id}-cluster"
   regional                        = true
   region                          = var.region
-  network                         = google_compute_network.vpc.name
-  subnetwork                      = google_compute_subnetwork.subnet.name
-  ip_range_pods                   = google_compute_subnetwork.subnet.ipv6_cidr_range
-  ip_range_services               = google_compute_subnetwork.subnet.ipv6_cidr_range
+  network                         = module.gcp-network.network_name
+  subnetwork                      = module.gcp-network.subnets_names[0]
+  ip_range_pods                   = "${var.project_id}-${var.env_name}-pods"
+  ip_range_services               = "${var.project_id}-${var.env_name}-services"
   release_channel                 = "REGULAR"
   enable_vertical_pod_autoscaling = true
+}
+
+resource "local_file" "kubeconfig" {
+  content  = module.gke_auth.kubeconfig_raw
+  filename = "kubeconfig-${var.env_name}"
 }

@@ -21,3 +21,8 @@ variable "gke_num_nodes" {
   default     = 2
   description = "number of gke nodes"
 }
+
+variable "env_name" {
+  default = "dev"
+  description = "Cluster Environment"
+}
